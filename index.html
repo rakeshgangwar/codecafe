@@ -1,29 +1,71 @@
-<html>
+<!DOCTYPE html>
+<!--
+    Code Cafe - Code Submission Browser
+    A web application for browsing and analyzing HackerEarth code submissions
+    Built with AngularJS, Bootstrap, and Express
+-->
+<html lang="en">
 
 <head>
-    <title>
-        Code Cafe
-    </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Cafe - Browse Code Submissions</title>
+    <meta name="description" content="Browse, search, and analyze coding submissions from HackerEarth">
+
+    <!-- Bootstrap CSS for responsive design -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles -->
     <link href="style.css" rel="stylesheet">
 </head>
 
+<!-- Bootstrap AngularJS application -->
 <body ng-app="CodeCafe">
-    <div class="header"><img class="logo" src="img/logo.png"></div>
+
+    <!-- Fixed header with application logo -->
+    <div class="header">
+        <img class="logo" src="img/logo.png" alt="Code Cafe Logo">
+    </div>
+
+    <!-- Main content area controlled by searchController -->
     <div class="content" ng-controller="searchController">
+
+        <!-- Left column: Code submission list (8/12 columns) -->
         <div class="codedata col-md-8">
+
+            <!-- Search input field with two-way data binding to quickSearch -->
             <input id="search" type="text" class="form-control" placeholder="Search by (title, level or language) - Case Sensitive" ng-model="quickSearch">
-            <img ng-show="imageLoading" id="imageLoading" src="img/loading.gif">
+
+            <!-- Loading spinner - shown while data is being fetched -->
+            <img ng-show="imageLoading" id="imageLoading" src="img/loading.gif" alt="Loading...">
+
+            <!--
+                Code submission cards
+                - ng-show="loading": Display only after data is loaded
+                - ng-repeat: Loop through filtered code submissions
+                - filter:quickSearch:compareValues: Custom search filter
+                - filter:levelCheckbox: Filter by selected status
+            -->
             <div ng-show="loading" class="box" ng-repeat="code in codeList | filter:quickSearch:compareValues | filter:levelCheckbox">
                 <div class="outerbox">
+                    <!-- Submission header showing title, status, and language -->
                     <div class="codeDetails">
                         <h4 id="title">{{code.title}}</h4>
-                        <h4 id="buttons">{{code.compiler_status}} | {{code.language}}</h4></div>
-                    <div class="innerbox"><pre><code>{{code.source_code}}</code></pre></div>
+                        <h4 id="buttons">{{code.compiler_status}} | {{code.language}}</h4>
+                    </div>
+
+                    <!-- Code display area with scrollable container -->
+                    <div class="innerbox">
+                        <pre><code>{{code.source_code}}</code></pre>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Right column: Filters and Statistics (4/12 columns) -->
         <div class="stats col-md-4">
+
+            <!-- Filter panel with radio buttons for submission status -->
             <div class="levelCheckbox">
                 <div class="checkboxStyle">
                     <h4>Filter Results</h4>
@@ -47,41 +89,70 @@
 
 
             </div>
+
+            <!--
+                Statistics Panel
+                Displays aggregate data about all submissions
+                Only shown after data is loaded (ng-show="loading")
+            -->
             <div ng-show="loading" class="codeStats">
                 <ul>
+                    <!-- Language distribution statistics -->
                     <li><b>Top languages used:</b>
                         <br>
                         <ul style="list-style: none">
                             <li ng-repeat="(key,val) in stats.top_5_languages_used"><b>{{key}}</b> : {{val}}</li>
                         </ul>
                     </li>
+
+                    <!-- Most attempted problems -->
                     <li><b>Top 2 submissions attempted:</b>
                         <br>
                         <ul style="list-style: none">
                             <li ng-repeat="(key,val) in stats.top_2_submissions_attempted"><b>{{key}}</b> : {{val}}</li>
                         </ul>
                     </li>
+
+                    <!-- Difficulty level breakdown -->
                     <li><b>Number of submissions per level:</b>
                         <br>
                         <ul style="list-style: none">
                             <li ng-repeat="(key,val) in stats.submissions_per_level"><b>{{key}}</b> : {{val}}</li>
                         </ul>
                     </li>
+
+                    <!-- Total count -->
                     <li><b>Total Submissions:</b> {{stats.total_submissions}}</li>
                 </ul>
             </div>
         </div>
 
     </div>
-</body>
+
+<!-- External JavaScript Libraries -->
+
+<!-- Lodash - Utility library for data manipulation -->
 <script src="https://cdn.jsdelivr.net/lodash/4.15.0/lodash.min.js"></script>
+
+<!-- AngularJS Core - MVC framework -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+
+<!-- Angular UI Bootstrap - Bootstrap components for AngularJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.1.3/ui-bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.1.3/ui-bootstrap-tpls.min.js"></script>
-<script src="app.js"></script>
-<script src="factories/codeFactory.js"></script>
-<script src="controllers/searchController.js"></script>
+
+<!-- Application Scripts -->
+<script src="app.js"></script>                              <!-- AngularJS module initialization -->
+<script src="factories/codeFactory.js"></script>            <!-- API service factory -->
+<script src="controllers/searchController.js"></script>     <!-- Main controller -->
+
+<!-- Inline JavaScript for search interaction -->
 <script>
+    /**
+     * Search box event handler
+     * Monitors keyup events on the search input field
+     * Currently logs when search is cleared (can be extended for additional functionality)
+     */
     var element = document.getElementById("search");
     element.onkeyup = function () {
         if (element.value == "") {
@@ -89,6 +160,11 @@
         }
     }
 
+    /**
+     * Clear all radio button selections
+     * Utility function to deselect all status filter radio buttons
+     * Can be called to reset the filter state
+     */
     function clearSelection() {
         var ele = document.getElementsByName("status");
         for (var i = 0; i < ele.length; i++)
@@ -96,4 +172,5 @@
     }
 </script>
 
+</body>
 </html>
